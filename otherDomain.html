@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>test5</title>
+</head>
+<body>
+
+<p id="hello">Hello i'm here</p>
+<div id="result"></div>
+
+
+<script>
+    window.onmessage = function(e) {
+        if (e.origin !== "https://test.waiwi.ru") {
+            return;
+        }
+        let payload = JSON.parse(e.data);
+        
+        let parent = window.parent;
+        switch(payload.method) {
+            case 'set':
+                let name = JSON.parse(payload.data).name;
+                localStorage.setItem(payload.key, JSON.stringify(name));
+                parent.postMessage(JSON.stringify({name: 'succesfull set'}), "*");
+                
+                let changeText = JSON.parse(payload.data).changeText;
+                eval('let func = ' + changeText + '; func();');
+                
+                break;
+            case 'get':
+                let data = localStorage.getItem(payload.key);
+                parent.postMessage(data, "*");
+                break;
+            case 'remove':
+                localStorage.removeItem(payload.key);
+                parent.postMessage(JSON.stringify({name: 'succesfull removed'}), "*");
+                break;
+        }
+    };
+</script>
+
+</body>
+</html>

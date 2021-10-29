@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>test5</title>
+</head>
+<body>
+
+<iframe src="https://media.waiwi.ru/otherDomain.html" id="iframe">
+</iframe>
+
+
+<script>
+    window.onload = function() {
+        let iframe = document.getElementsByTagName('iframe')[0];
+        let win = iframe.contentWindow;
+
+        let obj = {
+            name: "Dima",
+            changeText: function () {
+                document.getElementById('hello').innerHTML = 'Callback worked here: localStorage now have value ' + localStorage.getItem('storage');
+                console.log('hello');
+            },
+        };
+        
+
+        function replacer(key, value) {
+            if (typeof value === "function") {
+                return value.toString();
+            }
+            return value;
+        }
+
+        const objToStr = JSON.stringify(obj, replacer);
+
+        win.postMessage(JSON.stringify({key: 'storage', method: "set", data: objToStr}), "*");
+        window.onmessage = function(e) {
+            if (e.origin != "https://media.waiwi.ru") {
+                return;
+            }
+
+            console.log(JSON.parse(e.data).name);
+        };
+        win.postMessage(JSON.stringify({key: 'storage', method: "get"}), "*");
+    };
+</script>
+
+
+</body>
+</html>
